@@ -6,11 +6,24 @@ import { Product } from '../../types/shopify';
 import { Link } from 'expo-router';
 import {useProductStore} from '../../stores/useProductStores'; // Import the zustand store
 import { useRouter } from 'expo-router';
+import { createCheckout } from '../../services/shopify/shopify';
 
 export default function TabOneScreen() {
   const [products, setProducts] = useState<Product[]>([]);
   const router = useRouter();
   const setProduct = useProductStore((state: any) => state.setProduct); // Access the setProduct action
+
+  useEffect(() => {
+    const initializeCheckout = async () => {
+      try {
+        await createCheckout(); // Call the createCheckout function
+      } catch (error) {
+        console.error('Error initializing checkout:', error);
+      }
+    };
+
+    initializeCheckout(); // Call the async function to initialize checkout
+  }, []); // Empty dependency array to run only on mount
 
   useEffect(() => {
     const fetchProducts = async () => {
