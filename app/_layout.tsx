@@ -57,6 +57,7 @@ function RootLayoutNav() {
           options={{
             headerShown: true, // Ensure the header is shown
             headerBackTitle: 'Back',
+            headerTitle: 'Product Details',
           }}
         />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
