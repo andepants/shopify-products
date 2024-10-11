@@ -18,10 +18,21 @@ const client = Client.buildClient({
 export async function fetchAllProducts() {
   try {
     const products = await client.product.fetchAll();
-    // console.log('products', products[0].images[0]);
+    // console.log('products', products[0]);
     return products; // Return the products for further use
   } catch (error) {
     console.error('Error fetching products:', error);
+    throw error; // Re-throw the error if you want to handle it elsewhere
+  }
+}
+
+export async function fetchAllCollectionsWithProducts() {
+  try {
+    const collections = await client.collection.fetchAllWithProducts();
+    // return the first collection's products, will have to update if there is more collections
+    return collections[0].products;
+  } catch (error) {
+    console.error('Error fetching collections with products:', error);
     throw error; // Re-throw the error if you want to handle it elsewhere
   }
 }
@@ -41,9 +52,3 @@ export function fetchProductByHandle(handle: string) {
     console.log(product);
   });
 }
-
-// Example usage
-// fetchAllProducts();
-// fetchProductById('gid://shopify/Product/7857989384');
-// fetchProductByHandle('product-handle');
-
