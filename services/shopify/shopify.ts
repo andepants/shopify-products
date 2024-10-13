@@ -1,11 +1,12 @@
 import Client from 'shopify-buy';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCheckoutStore } from '../../stores/useProductStores';
 
 // Initializing a client to return content in the store's primary language
 const client = Client.buildClient({
   domain: '0297ef-53.myshopify.com',
-  storefrontAccessToken: '99980f465b1012db68289115fd99b0ec',
-  apiVersion: '2024-04' // changelogs for api version udpates: https://github.com/Shopify/js-buy-sdk/blob/main/CHANGELOG.md
+  storefrontAccessToken: 'cdeeeeecefb9a38b54288e286a2b0f99',
+  apiVersion: '2024-04'
 });
 
 // Initializing a client to return translated content
@@ -37,7 +38,9 @@ export const createCheckout = async () => {
 
       // Fetch the existing checkout
       const checkout = await client.checkout.fetch(checkoutId);
-      console.log('Fetched existing checkout:');
+      // update checkoutStore
+      useCheckoutStore.setState({ checkout: checkout });
+      console.log('Fetched existing checkout: ');
       return checkout;
     }
 
@@ -47,6 +50,7 @@ export const createCheckout = async () => {
 
     // Store the new checkout in AsyncStorage
     await AsyncStorage.setItem('checkout', JSON.stringify(checkout));
+    useCheckoutStore.setState({ checkout: checkout });
     return checkout;
   } catch (error) {
     console.error('Error creating or retrieving checkout:', error);
@@ -54,12 +58,22 @@ export const createCheckout = async () => {
   }
 };
 
+// client.checkout.fetch(checkoutId).then((checkout) => {
+//   // Do something with the checkout
+//   console.log(checkout);
+// });
+
 // Add an item to the checkout
-export const addLineItems = (checkoutId: string, lineItemsToAdd: any[]) => {
-  client.checkout.addLineItems(checkoutId, lineItemsToAdd).then((checkout) => {
-    // Do something with the updated checkout
-    console.log(checkout.lineItems); // Array with one additional line item
-  });
+export const addLineItems = async (checkoutId: string, lineItemsToAdd: any[]) => {
+  try {
+    const checkout = await client.checkout.addLineItems(checkoutId, lineItemsToAdd);
+    await AsyncStorage.setItem('checkout', JSON.stringify(checkout));
+    useCheckoutStore.setState({ checkout: checkout });
+    // console.log('Added line items:', checkout.lineItems);
+  } catch (error) {
+    console.error('Error adding line items:', error);
+    throw error;
+  }
 };
 
 // Update the line item on the checkout (change the quantity or variant)

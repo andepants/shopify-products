@@ -1,28 +1,8 @@
-import React, { useEffect, useState } from 'react';
 import { StyleSheet, ScrollView, Text, View, Image } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCheckoutStore } from '../stores/useProductStores';
 
 export default function ModalScreen() {
-  const [checkout, setCheckout] = useState<any>(null);
-
-  // Retrieve checkout from AsyncStorage
-  const getCheckout = async () => {
-    try {
-      const existingCheckout = await AsyncStorage.getItem('checkout');
-      console.log('Retrieved checkout from AsyncStorage:', existingCheckout); // Debugging line
-      if (existingCheckout) {
-        const parsedCheckout = JSON.parse(existingCheckout);
-        console.log('Parsed checkout:', parsedCheckout); // Debugging line
-        setCheckout(parsedCheckout);
-      }
-    } catch (error) {
-      console.error('Error retrieving checkout:', error);
-    }
-  };
-
-  useEffect(() => {
-    getCheckout();
-  }, []);
+  const checkout = useCheckoutStore((state: any) => state.checkout);
 
   return (
     <ScrollView style={styles.container}>
@@ -32,7 +12,7 @@ export default function ModalScreen() {
           <Text>ID: {checkout.id}</Text>
           <Text>Created At: {new Date(checkout.createdAt).toLocaleString()}</Text>
           <Text>Currency: {checkout.currencyCode}</Text>
-          <Text>Total Price: {checkout.totalPrice.amount} {checkout.totalPrice.currencyCode}</Text>
+          <Text>Total Price: {checkout.totalPrice?.amount} {checkout.totalPrice.currencyCode}</Text>
           <Text>Payment Due: {checkout.paymentDue.amount} {checkout.paymentDue.currencyCode}</Text>
           <Text>Requires Shipping: {checkout.requiresShipping ? 'Yes' : 'No'}</Text>
           <Text>Web URL: {checkout.webUrl}</Text>
@@ -51,7 +31,7 @@ export default function ModalScreen() {
           ) : (
             <Text>No line items in the checkout</Text>
           )}
-          {checkout.errors.length > 0 && (
+          {checkout.errors?.length > 0 && (
             <View>
               <Text style={styles.subtitle}>Errors:</Text>
               {checkout.errors.map((error: any, index: number) => (
