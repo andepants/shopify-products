@@ -37,13 +37,13 @@ export const createCheckout = async () => {
 
       // Fetch the existing checkout
       const checkout = await client.checkout.fetch(checkoutId);
-      console.log('Fetched existing checkout:', checkout);
+      console.log('Fetched existing checkout:');
       return checkout;
     }
 
     // Create a new checkout if none exists
     const checkout = await client.checkout.create();
-    console.log('New checkout created:', checkout);
+    console.log('New checkout created:');
 
     // Store the new checkout in AsyncStorage
     await AsyncStorage.setItem('checkout', JSON.stringify(checkout));

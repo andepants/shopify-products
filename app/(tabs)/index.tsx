@@ -13,6 +13,7 @@ export default function TabOneScreen() {
   const router = useRouter();
   const setProduct = useProductStore((state: any) => state.setProduct); // Access the setProduct action
 
+
   useEffect(() => {
     const initializeCheckout = async () => {
       try {

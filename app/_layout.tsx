@@ -60,7 +60,13 @@ function RootLayoutNav() {
             headerTitle: 'Product Details',
           }}
         />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen
+          name="shoppingCart"
+          options={{
+            headerBackTitle: 'Back',
+            headerTitle: 'Checkout', // Set the title for the shoppingCart screen
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

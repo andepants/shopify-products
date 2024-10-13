@@ -1,13 +1,38 @@
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { useProductStore } from '../../stores/useProductStores';
+import { addLineItems } from '../../services/shopify/shopify';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 
 const Details = () => {
   const product = useProductStore((state: any) => state.product);
+  const router = useRouter();
 
   if (!product) {
     return <Text style={styles.loadingText}>Loading...</Text>; // Handle the case where the product is not yet set
   }
+
+  const handleAddToCart = async () => {
+    const existingCheckout = await AsyncStorage.getItem('checkout');
+    const lineItemsToAdd = [
+      {
+        variantId: product.variants[0].id,
+        quantity: 1,
+        customAttributes: []
+      }
+    ]
+    if (existingCheckout) {
+      const parsedCheckout = JSON.parse(existingCheckout);
+      const checkoutId = parsedCheckout.id;
+      addLineItems(checkoutId, lineItemsToAdd);
+      router.push('/shoppingCart');
+    } else {
+      console.log('No existing checkout found');
+    }
+
+  };
+
 
   return (
     <ScrollView style={styles.container}>
@@ -28,6 +53,9 @@ const Details = () => {
         <Text style={styles.compareAtPrice}>${product.variants[0].compareAtPrice.amount}</Text>
       </View>
       <Text style={styles.description}>{product.description}</Text>
+      <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
+        <Text style={styles.addToCartButtonText}>Add to Cart</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -102,6 +130,16 @@ const styles = StyleSheet.create({
     color: '#999',
     textAlign: 'center',
     marginTop: 20,
+  },
+  addToCartButton: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 5,
+  },
+  addToCartButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
