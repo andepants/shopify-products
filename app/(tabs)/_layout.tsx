@@ -29,8 +29,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Shop',
+          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-bag" color={color} />,
           headerRight: () => (
             <Link href="/shoppingCart" asChild>
               <Pressable>

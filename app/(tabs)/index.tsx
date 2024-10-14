@@ -13,7 +13,6 @@ export default function TabOneScreen() {
   const router = useRouter();
   const setProduct = useProductStore((state: any) => state.setProduct); // Access the setProduct action
 
-
   useEffect(() => {
     const initializeCheckout = async () => {
       try {
@@ -46,8 +45,6 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       {products.length > 0 ? (
         products.map((product, index) => (
           <View key={index} style={styles.productContainer}>

@@ -1,22 +1,54 @@
-import { StyleSheet, ScrollView, Text, View, Image } from 'react-native';
+import { StyleSheet, ScrollView, Text, View, Image, TouchableOpacity } from 'react-native';
 import { useCheckoutStore } from '../stores/useProductStores';
+import { useShopifyCheckoutSheet } from '@shopify/checkout-sheet-kit';
+
+const transformCheckoutUrl = (url: string): string => {
+  try {
+    const urlObj = new URL(url);
+    const pathSegments = urlObj.pathname.split('/');
+
+    // Remove the unnecessary segment (e.g., '90661552420')
+    if (pathSegments.length > 3) {
+      pathSegments.splice(1, 1); // Remove the second segment
+    }
+
+    // Add 'co' after 'checkouts'
+    if (!pathSegments.includes('co')) {
+      pathSegments.splice(2, 0, 'co');
+    }
+
+    // Reconstruct the URL
+    urlObj.pathname = pathSegments.join('/');
+    return urlObj.toString();
+  } catch (error) {
+    console.error('Error transforming URL:', error);
+    return url; // Return the original URL if there's an error
+  }
+};
 
 export default function ModalScreen() {
   const checkout = useCheckoutStore((state: any) => state.checkout);
+  const shopifyCheckout = useShopifyCheckoutSheet();
+
+  const openShopifyWebURL = () => {
+    // console.log('openShopifyWebURL with checkout.webURL :', checkout.webUrl);
+    try {
+      if (checkout && checkout.webUrl) {
+        const transformedUrl = transformCheckoutUrl(checkout.webUrl);
+        // console.log('Transformed URL:', transformedUrl);
+        shopifyCheckout.present(transformedUrl);
+      } else {
+        console.error('Invalid checkout URL');
+      }
+    } catch (error) {
+      console.error('Error presenting Shopify Checkout:', error);
+    }
+  }
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Checkout Details</Text>
       {checkout ? (
         <View>
-          <Text>ID: {checkout.id}</Text>
-          <Text>Created At: {new Date(checkout.createdAt).toLocaleString()}</Text>
-          <Text>Currency: {checkout.currencyCode}</Text>
-          <Text>Total Price: {checkout.totalPrice?.amount} {checkout.totalPrice.currencyCode}</Text>
-          <Text>Payment Due: {checkout.paymentDue.amount} {checkout.paymentDue.currencyCode}</Text>
-          <Text>Requires Shipping: {checkout.requiresShipping ? 'Yes' : 'No'}</Text>
-          <Text>Web URL: {checkout.webUrl}</Text>
-          <Text style={styles.subtitle}>Line Items:</Text>
           {checkout.lineItems.length > 0 ? (
             checkout.lineItems.map((item: any) => (
               <View key={item.id} style={styles.itemContainer}>
@@ -31,6 +63,10 @@ export default function ModalScreen() {
           ) : (
             <Text>No line items in the checkout</Text>
           )}
+          <Text style={styles.totalPrice}>Total: {checkout.totalPrice?.amount} {checkout.totalPrice.currencyCode}</Text>
+          <TouchableOpacity style={styles.checkoutButton} onPress={openShopifyWebURL}>
+            <Text style={styles.checkoutButtonText}>Checkout</Text>
+          </TouchableOpacity>
           {checkout.errors?.length > 0 && (
             <View>
               <Text style={styles.subtitle}>Errors:</Text>
@@ -51,11 +87,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
   },
   subtitle: {
     fontSize: 20,
@@ -86,5 +117,21 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     marginTop: 5,
+  },
+  checkoutButton: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  checkoutButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  totalPrice: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 10,
   },
 });

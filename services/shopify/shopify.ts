@@ -40,7 +40,7 @@ export const createCheckout = async () => {
       const checkout = await client.checkout.fetch(checkoutId);
       // update checkoutStore
       useCheckoutStore.setState({ checkout: checkout });
-      console.log('Fetched existing checkout: ');
+      // console.log('Fetched existing checkout: ', checkout);
       return checkout;
     }
 

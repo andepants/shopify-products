@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import {ShopifyCheckoutSheetProvider} from '@shopify/checkout-sheet-kit';
 
 import { useColorScheme } from '@/components/useColorScheme';
 
@@ -50,24 +51,26 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="details/[id]"
-          options={{
-            headerShown: true, // Ensure the header is shown
-            headerBackTitle: 'Back',
-            headerTitle: 'Product Details',
-          }}
-        />
-        <Stack.Screen
-          name="shoppingCart"
-          options={{
-            headerBackTitle: 'Back',
-            headerTitle: 'Checkout', // Set the title for the shoppingCart screen
-          }}
-        />
-      </Stack>
+      <ShopifyCheckoutSheetProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="details/[id]"
+            options={{
+              headerShown: true, // Ensure the header is shown
+              headerBackTitle: 'Back',
+              headerTitle: 'Product Details',
+            }}
+          />
+          <Stack.Screen
+            name="shoppingCart"
+            options={{
+              headerBackTitle: 'Back',
+              headerTitle: 'Checkout', // Set the title for the shoppingCart screen
+            }}
+          />
+        </Stack>
+      </ShopifyCheckoutSheetProvider>
     </ThemeProvider>
   );
 }
