@@ -20,11 +20,10 @@ const client = Client.buildClient({
 export async function fetchAllProducts() {
   try {
     const products = await client.product.fetchAll();
-    // console.log('products', products[0]);
-    return products; // Return the products for further use
+    return products;
   } catch (error) {
     console.error('Error fetching products:', error);
-    throw error; // Re-throw the error if you want to handle it elsewhere
+    throw error;
   }
 }
 
@@ -38,30 +37,20 @@ export const createCheckout = async () => {
 
       // Fetch the existing checkout
       const checkout = await client.checkout.fetch(checkoutId);
-      // update checkoutStore
       useCheckoutStore.setState({ checkout: checkout });
-      // console.log('Fetched existing checkout: ', checkout);
       return checkout;
     }
 
     // Create a new checkout if none exists
     const checkout = await client.checkout.create();
-    console.log('New checkout created:');
-
-    // Store the new checkout in AsyncStorage
     await AsyncStorage.setItem('checkout', JSON.stringify(checkout));
     useCheckoutStore.setState({ checkout: checkout });
     return checkout;
   } catch (error) {
     console.error('Error creating or retrieving checkout:', error);
-    throw error; // Re-throw the error if you want to handle it elsewhere
+    throw error;
   }
 };
-
-// client.checkout.fetch(checkoutId).then((checkout) => {
-//   // Do something with the checkout
-//   console.log(checkout);
-// });
 
 // Add an item to the checkout
 export const addLineItems = async (checkoutId: string, lineItemsToAdd: any[]) => {
@@ -69,7 +58,6 @@ export const addLineItems = async (checkoutId: string, lineItemsToAdd: any[]) =>
     const checkout = await client.checkout.addLineItems(checkoutId, lineItemsToAdd);
     await AsyncStorage.setItem('checkout', JSON.stringify(checkout));
     useCheckoutStore.setState({ checkout: checkout });
-    // console.log('Added line items:', checkout.lineItems);
   } catch (error) {
     console.error('Error adding line items:', error);
     throw error;
@@ -77,46 +65,61 @@ export const addLineItems = async (checkoutId: string, lineItemsToAdd: any[]) =>
 };
 
 // Update the line item on the checkout (change the quantity or variant)
-export const updateLineItems = (checkoutId: string, lineItemsToUpdate: any[]) => {
-  client.checkout.updateLineItems(checkoutId, lineItemsToUpdate).then((checkout) => {
-  // Do something with the updated checkout
-    console.log(checkout.lineItems); // Quantity of line item 'gid://shopify/Product/7857989384' updated to 2
-  });
+export const updateLineItems = async (checkoutId: string, lineItemsToUpdate: any[]) => {
+  try {
+    const checkout = await client.checkout.updateLineItems(checkoutId, lineItemsToUpdate);
+    // console.log(checkout.lineItems);
+    await AsyncStorage.setItem('checkout', JSON.stringify(checkout));
+    useCheckoutStore.setState({ checkout: checkout });
+  } catch (error) {
+    console.error('Error updating line items:', error);
+    throw error;
+  }
 };
 
 // Remove an item from the checkout
-export const removeLineItems = (checkoutId: string, lineItemIdsToRemove: string[]) => {
-  client.checkout.removeLineItems(checkoutId, lineItemIdsToRemove).then((checkout) => {
-  // Do something with the updated checkout
-    console.log(checkout.lineItems); // Checkout with line item 'gid://shopify/CheckoutLineItem/194677729198640?checkout=e3bd71f7248c806f33725a53e33931ef' removed
-  });
+export const removeLineItems = async (checkoutId: string, lineItemIdsToRemove: string[]) => {
+  try {
+    const checkout = await client.checkout.removeLineItems(checkoutId, lineItemIdsToRemove);
+    // console.log(checkout.lineItems);
+    await AsyncStorage.setItem('checkout', JSON.stringify(checkout));
+    useCheckoutStore.setState({ checkout: checkout });
+  } catch (error) {
+    console.error('Error removing line items:', error);
+    throw error;
+  }
 };
-
-
 
 export async function fetchAllCollectionsWithProducts() {
   try {
     const collections = await client.collection.fetchAllWithProducts();
-    // return the first collection's products, will have to update if there is more collections
     return collections[0].products;
   } catch (error) {
     console.error('Error fetching collections with products:', error);
-    throw error; // Re-throw the error if you want to handle it elsewhere
+    throw error;
   }
 }
 
 // Function to fetch a single product by ID
-export function fetchProductById(productId: string) {
-  return client.product.fetch(productId).then((product) => {
-    // Do something with the product
+export async function fetchProductById(productId: string) {
+  try {
+    const product = await client.product.fetch(productId);
     console.log(product);
-  });
+    return product;
+  } catch (error) {
+    console.error('Error fetching product by ID:', error);
+    throw error;
+  }
 }
 
 // Function to fetch a single product by Handle
-export function fetchProductByHandle(handle: string) {
-  return client.product.fetchByHandle(handle).then((product) => {
-    // Do something with the product
+export async function fetchProductByHandle(handle: string) {
+  try {
+    const product = await client.product.fetchByHandle(handle);
     console.log(product);
-  });
+    return product;
+  } catch (error) {
+    console.error('Error fetching product by handle:', error);
+    throw error;
+  }
 }

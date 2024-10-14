@@ -1,6 +1,7 @@
 import { StyleSheet, ScrollView, Text, View, Image, TouchableOpacity } from 'react-native';
 import { useCheckoutStore } from '../stores/useProductStores';
 import { useShopifyCheckoutSheet } from '@shopify/checkout-sheet-kit';
+import { removeLineItems } from '../services/shopify/shopify';
 
 const transformCheckoutUrl = (url: string): string => {
   try {
@@ -31,11 +32,9 @@ export default function ModalScreen() {
   const shopifyCheckout = useShopifyCheckoutSheet();
 
   const openShopifyWebURL = () => {
-    // console.log('openShopifyWebURL with checkout.webURL :', checkout.webUrl);
     try {
       if (checkout && checkout.webUrl) {
         const transformedUrl = transformCheckoutUrl(checkout.webUrl);
-        // console.log('Transformed URL:', transformedUrl);
         shopifyCheckout.present(transformedUrl);
       } else {
         console.error('Invalid checkout URL');
@@ -43,11 +42,21 @@ export default function ModalScreen() {
     } catch (error) {
       console.error('Error presenting Shopify Checkout:', error);
     }
-  }
+  };
+
+  const handleRemoveItem = async (lineItemId: string) => {
+    try {
+      if (checkout && checkout.id) {
+        await removeLineItems(checkout.id, [lineItemId]);
+      }
+    } catch (error) {
+      console.error('Error removing line item:', error);
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
-      {checkout ? (
+      {checkout && checkout.lineItems.length !== 0 ? (
         <View>
           {checkout.lineItems.length > 0 ? (
             checkout.lineItems.map((item: any) => (
@@ -57,11 +66,14 @@ export default function ModalScreen() {
                   <Text style={styles.itemTitle}>{item.title}</Text>
                   <Text>Qty: {item.quantity}</Text>
                   <Text>Price: {item.variant.price.amount} {item.variant.price.currencyCode}</Text>
+                  <TouchableOpacity onPress={() => handleRemoveItem(item.id)}>
+                    <Text style={styles.removeButton}>Remove</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             ))
           ) : (
-            <Text>No line items in the checkout</Text>
+            <Text>Your cart is empty!</Text>
           )}
           <Text style={styles.totalPrice}>Total: {checkout.totalPrice?.amount} {checkout.totalPrice.currencyCode}</Text>
           <TouchableOpacity style={styles.checkoutButton} onPress={openShopifyWebURL}>
@@ -77,7 +89,7 @@ export default function ModalScreen() {
           )}
         </View>
       ) : (
-        <Text>No checkout data available</Text>
+        <Text>Your cart is empty!</Text>
       )}
     </ScrollView>
   );
@@ -133,5 +145,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 10,
+  },
+  removeButton: {
+    color: 'gray',
+    textDecorationLine: 'underline',
+    marginTop: 5,
   },
 });
