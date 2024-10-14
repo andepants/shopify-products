@@ -1,7 +1,7 @@
 import { StyleSheet, ScrollView, Text, View, Image, TouchableOpacity } from 'react-native';
 import { useCheckoutStore } from '../stores/useProductStores';
 import { useShopifyCheckoutSheet } from '@shopify/checkout-sheet-kit';
-import { removeLineItems } from '../services/shopify/shopify';
+import { removeLineItems, updateLineItems } from '../services/shopify/shopify';
 
 const transformCheckoutUrl = (url: string): string => {
   try {
@@ -54,6 +54,16 @@ export default function ModalScreen() {
     }
   };
 
+  const handleUpdateQuantity = async (lineItemId: string, quantity: number) => {
+    try {
+      if (checkout && checkout.id) {
+        await updateLineItems(checkout.id, [{ id: lineItemId, quantity }]);
+      }
+    } catch (error) {
+      console.error('Error updating line item quantity:', error);
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       {checkout && checkout.lineItems.length !== 0 ? (
@@ -63,9 +73,20 @@ export default function ModalScreen() {
               <View key={item.id} style={styles.itemContainer}>
                 <Image source={{ uri: item.variant.image.src }} style={styles.itemImage} />
                 <View style={styles.itemDetails}>
+                  <Text>
+                    {item.variant.price.currencyCode === 'USD' ? '$' : ''}
+                    {item.variant.price.amount} {checkout.totalPrice.currencyCode === 'USD' ? '' : checkout.totalPrice.currencyCode}
+                  </Text>
                   <Text style={styles.itemTitle}>{item.title}</Text>
-                  <Text>Qty: {item.quantity}</Text>
-                  <Text>Price: {item.variant.price.amount} {item.variant.price.currencyCode}</Text>
+                  <View style={styles.quantityContainer}>
+                    <TouchableOpacity onPress={() => handleUpdateQuantity(item.id, item.quantity - 1)}>
+                      <Text style={styles.quantityButton}>-</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.quantityText}>{item.quantity}</Text>
+                    <TouchableOpacity onPress={() => handleUpdateQuantity(item.id, item.quantity + 1)}>
+                      <Text style={styles.quantityButton}>+</Text>
+                    </TouchableOpacity>
+                  </View>
                   <TouchableOpacity onPress={() => handleRemoveItem(item.id)}>
                     <Text style={styles.removeButton}>Remove</Text>
                   </TouchableOpacity>
@@ -75,7 +96,10 @@ export default function ModalScreen() {
           ) : (
             <Text>Your cart is empty!</Text>
           )}
-          <Text style={styles.totalPrice}>Total: {checkout.totalPrice?.amount} {checkout.totalPrice.currencyCode}</Text>
+          <Text style={styles.totalPrice}>
+            Total: {checkout.totalPrice?.currencyCode === 'USD' ? '$' : ''}
+            {checkout.totalPrice?.amount} {checkout.totalPrice.currencyCode === 'USD' ? '' : checkout.totalPrice.currencyCode}
+          </Text>
           <TouchableOpacity style={styles.checkoutButton} onPress={openShopifyWebURL}>
             <Text style={styles.checkoutButtonText}>Checkout</Text>
           </TouchableOpacity>
@@ -150,5 +174,23 @@ const styles = StyleSheet.create({
     color: 'gray',
     textDecorationLine: 'underline',
     marginTop: 5,
+  },
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start', // Ensures the container only wraps its content
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 2,
+    marginTop: 5,
+  },
+  quantityButton: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+  },
+  quantityText: {
+    fontSize: 14,
+    marginHorizontal: 10,
   },
 });
