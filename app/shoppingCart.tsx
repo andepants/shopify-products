@@ -1,5 +1,5 @@
 import { StyleSheet, ScrollView, Text, View, Image, TouchableOpacity } from 'react-native';
-import { useCheckoutStore } from '../stores/useProductStores';
+import { useCheckoutStore } from '../stores/useShopifyStore';
 import { useShopifyCheckoutSheet } from '@shopify/checkout-sheet-kit';
 import { removeLineItems, updateLineItems } from '../services/shopify/shopify';
 

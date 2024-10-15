@@ -4,7 +4,7 @@ import { Text, View } from '@/components/Themed';
 import { fetchAllProducts } from '../../services/shopify/shopify';
 import { Product } from '../../types/shopify';
 import { Link } from 'expo-router';
-import {useProductStore} from '../../stores/useProductStores'; // Import the zustand store
+import {useProductStore} from '../../stores/useShopifyStore'; // Import the zustand store
 import { useRouter } from 'expo-router';
 import { createCheckout } from '../../services/shopify/shopify';
 
