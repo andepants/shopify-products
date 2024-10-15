@@ -4,13 +4,26 @@ import { Text, View } from '@/components/Themed';
 import { fetchAllProducts } from '../../services/shopify/shopify';
 import { Product } from '../../types/shopify';
 import { Link } from 'expo-router';
-import {useProductStore} from '../../stores/useProductStores'; // Import the zustand store
+import {useProductStore} from '../../stores/useShopifyStore'; // Import the zustand store
 import { useRouter } from 'expo-router';
+import { createCheckout } from '../../services/shopify/shopify';
 
 export default function TabOneScreen() {
   const [products, setProducts] = useState<Product[]>([]);
   const router = useRouter();
   const setProduct = useProductStore((state: any) => state.setProduct); // Access the setProduct action
+
+  useEffect(() => {
+    const initializeCheckout = async () => {
+      try {
+        await createCheckout(); // Call the createCheckout function
+      } catch (error) {
+        console.error('Error initializing checkout:', error);
+      }
+    };
+
+    initializeCheckout(); // Call the async function to initialize checkout
+  }, []); // Empty dependency array to run only on mount
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -32,8 +45,6 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       {products.length > 0 ? (
         products.map((product, index) => (
           <View key={index} style={styles.productContainer}>

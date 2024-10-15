@@ -1,54 +1,83 @@
 import Client from 'shopify-buy';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCheckoutStore } from '../../stores/useShopifyStore';
 
-// Initializing a client to return content in the store's primary language
 const client = Client.buildClient({
   domain: '0297ef-53.myshopify.com',
-  storefrontAccessToken: '99980f465b1012db68289115fd99b0ec',
-  apiVersion: '2024-10'
+  storefrontAccessToken: 'cdeeeeecefb9a38b54288e286a2b0f99',
+  apiVersion: '2024-04'
 });
 
-// Initializing a client to return translated content
-// const clientWithTranslatedContent = Client.buildClient({
-//   domain: 'your-shop-name.myshopify.com',
-//   storefrontAccessToken: 'your-storefront-access-token',
-//   language: 'ja-JP'
-// });
-
-// Function to fetch all products
 export async function fetchAllProducts() {
   try {
     const products = await client.product.fetchAll();
-    // console.log('products', products[0]);
-    return products; // Return the products for further use
+    return products;
   } catch (error) {
     console.error('Error fetching products:', error);
-    throw error; // Re-throw the error if you want to handle it elsewhere
+    throw error;
   }
 }
+
+export const createCheckout = async () => {
+  try {
+    const existingCheckout = await AsyncStorage.getItem('checkout');
+    if (existingCheckout) {
+      const parsedCheckout = JSON.parse(existingCheckout);
+      const checkoutId = parsedCheckout.id;
+
+      // Fetch the existing checkout
+      const checkout = await client.checkout.fetch(checkoutId);
+      useCheckoutStore.setState({ checkout: checkout });
+      return checkout;
+    }
+
+    // Create a new checkout if none exists
+    const checkout = await client.checkout.create();
+    await AsyncStorage.setItem('checkout', JSON.stringify(checkout));
+    useCheckoutStore.setState({ checkout: checkout });
+    return checkout;
+  } catch (error) {
+    console.error('Error creating or retrieving checkout:', error);
+    throw error;
+  }
+};
+
+export const addLineItems = async (checkoutId: string, lineItemsToAdd: any[]) => {
+  try {
+    const checkout = await client.checkout.addLineItems(checkoutId, lineItemsToAdd);
+    useCheckoutStore.setState({ checkout: checkout });
+  } catch (error) {
+    console.error('Error adding line items:', error);
+    throw error;
+  }
+};
+
+export const updateLineItems = async (checkoutId: string, lineItemsToUpdate: any[]) => {
+  try {
+    const checkout = await client.checkout.updateLineItems(checkoutId, lineItemsToUpdate);
+    useCheckoutStore.setState({ checkout: checkout });
+  } catch (error) {
+    console.error('Error updating line items:', error);
+    throw error;
+  }
+};
+
+export const removeLineItems = async (checkoutId: string, lineItemIdsToRemove: string[]) => {
+  try {
+    const checkout = await client.checkout.removeLineItems(checkoutId, lineItemIdsToRemove);
+    useCheckoutStore.setState({ checkout: checkout });
+  } catch (error) {
+    console.error('Error removing line items:', error);
+    throw error;
+  }
+};
 
 export async function fetchAllCollectionsWithProducts() {
   try {
     const collections = await client.collection.fetchAllWithProducts();
-    // return the first collection's products, will have to update if there is more collections
     return collections[0].products;
   } catch (error) {
     console.error('Error fetching collections with products:', error);
-    throw error; // Re-throw the error if you want to handle it elsewhere
+    throw error;
   }
-}
-
-// Function to fetch a single product by ID
-export function fetchProductById(productId: string) {
-  return client.product.fetch(productId).then((product) => {
-    // Do something with the product
-    console.log(product);
-  });
-}
-
-// Function to fetch a single product by Handle
-export function fetchProductByHandle(handle: string) {
-  return client.product.fetchByHandle(handle).then((product) => {
-    // Do something with the product
-    console.log(product);
-  });
 }
