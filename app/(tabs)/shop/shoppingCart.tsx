@@ -1,7 +1,7 @@
 import { StyleSheet, ScrollView, Text, View, Image, TouchableOpacity } from 'react-native';
-import { useCheckoutStore } from '../stores/useShopifyStore';
+import { useCheckoutStore } from '../../../stores/useShopifyStore';
 import { useShopifyCheckoutSheet } from '@shopify/checkout-sheet-kit';
-import { removeLineItems, updateLineItems } from '../services/shopify/shopify';
+import { removeLineItems, updateLineItems } from '../../../services/shopify/shopify';
 
 const transformCheckoutUrl = (url: string): string => {
   try {

@@ -1,10 +1,10 @@
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { useProductStore } from '../../stores/useShopifyStore';
-import { addLineItems } from '../../services/shopify/shopify';
+import { useProductStore } from '../../../../stores/useShopifyStore';
+import { addLineItems } from '../../../../services/shopify/shopify';
 import { useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
-import { useCheckoutStore } from '../../stores/useShopifyStore';
+import { useCheckoutStore } from '../../../../stores/useShopifyStore';
 
 const Details = () => {
   const product = useProductStore((state: any) => state.product);
@@ -33,7 +33,7 @@ const Details = () => {
       }
     ];
     addLineItems(checkout.id, lineItemsToAdd);
-    router.push('/shoppingCart');
+    router.push('../shoppingCart');
   };
 
   const handleJoinWaitlist = () => {
