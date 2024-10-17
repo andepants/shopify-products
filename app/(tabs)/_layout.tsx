@@ -30,12 +30,13 @@ export default function TabLayout() {
         headerShown: useClientOnlyValue(false, true),
       }}>
       <Tabs.Screen
-        name="index"
+        name="shop"
         options={{
+          headerShown: false,
           title: 'Shop',
           tabBarIcon: ({ color }) => <TabBarIcon name="shopping-bag" color={color} />,
           headerRight: () => (
-            <Link href="/shoppingCart" asChild>
+            <Link href="/shop/shoppingCart" asChild>
               <Pressable>
                 {({ pressed }) => (
                   <View style={{ flexDirection: 'row', alignItems: 'center' }}>

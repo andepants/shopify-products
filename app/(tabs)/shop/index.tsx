@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Image, Pressable, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import { fetchAllProducts } from '../../services/shopify/shopify';
-import { Product } from '../../types/shopify';
+import { fetchAllProducts } from '../../../services/shopify/shopify';
+import { Product } from '../../../types/shopify';
 import { Link } from 'expo-router';
-import {useProductStore} from '../../stores/useShopifyStore'; // Import the zustand store
+import {useProductStore} from '../../../stores/useShopifyStore'; // Import the zustand store
 import { useRouter } from 'expo-router';
-import { createCheckout } from '../../services/shopify/shopify';
+import { createCheckout } from '../../../services/shopify/shopify';
 
 export default function TabOneScreen() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -40,7 +40,7 @@ export default function TabOneScreen() {
 
   const handleProductPress = (product: Product) => {
     setProduct(product);
-    router.push(`/details/${product.id.slice(-13)}`);
+    router.push(`/shop/details/${product.id.slice(-13)}`);
   };
 
   return (

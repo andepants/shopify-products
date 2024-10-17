@@ -58,39 +58,6 @@ function RootLayoutNav() {
       <ShopifyCheckoutSheetProvider>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="details/[id]"
-            options={{
-              headerShown: true, // Ensure the header is shown
-              headerBackTitle: 'Back',
-              headerTitle: 'Product Details',
-              headerRight: () => (
-                <Link href="/shoppingCart" asChild>
-                  <Pressable>
-                    {({ pressed }) => (
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Text style={{ marginRight: 5, fontSize: 16 }}>
-                          {totalItemsInCart}
-                        </Text>
-                        <FontAwesome
-                          name="shopping-cart"
-                          size={20}
-                          style={{ marginRight: 0, opacity: pressed ? 0.5 : 1 }}
-                        />
-                      </View>
-                    )}
-                  </Pressable>
-                </Link>
-              ),
-            }}
-          />
-          <Stack.Screen
-            name="shoppingCart"
-            options={{
-              headerBackTitle: 'Back',
-              headerTitle: 'Shopping Cart', // Set the title for the shoppingCart screen
-            }}
-          />
         </Stack>
       </ShopifyCheckoutSheetProvider>
     </ThemeProvider>
